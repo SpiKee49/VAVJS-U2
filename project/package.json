@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon server.js",
     "ws-server": "nodemon server-side.js",
-    "start": "npm run server & npm run ws-server"
+    "start": "npm run server | npm run ws-server"
   },
   "author": "",
   "license": "ISC",
