@@ -11,7 +11,6 @@ function addRegisterLogin() {
     const register = document.createElement('BUTTON')
     register.innerText = 'Register'
     register.onclick = () => {
-        clearInterval(ival)
         showRegistePopup()
     }
     document.body.appendChild(register)
@@ -345,16 +344,19 @@ const socket = new WebSocket('ws://localhost:8082')
 // Connection opened
 socket.addEventListener('open', (e) => {
     console.log('Connected to WS Server')
+    socket.send('start the game ma man')
 })
 
-socket.addEventListener('start', (e) => {
-    console.log(e.data)
+socket.addEventListener('message', (e) => {
+    const data = JSON.parse(e.data)
+    iter = data.iter
+    undrawLine()
+    drawLine(data.line)
+    drawPlayer(data.playerTx, data.playerTy)
 })
 
 // function gameLoop() {
-//     undrawLine()
-//     drawLine(line)
-//     drawPlayer(playerTx, playerTy)
+//
 // }
 
 document.addEventListener('keydown', function (ev) {

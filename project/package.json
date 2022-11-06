@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "node server.js",
-    "ws-server": "node server-side.js",
+    "server": "nodemon server.js",
+    "ws-server": "nodemon server-side.js",
     "start": "npm run server & npm run ws-server"
   },
   "author": "",
