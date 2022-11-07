@@ -1,3 +1,7 @@
+/**
+ * u2 - Rene Bukovina
+ */
+
 import express from 'express'
 
 const app = express()
@@ -20,11 +24,17 @@ app.post('/register', function (req, res) {
             .end()
     } else {
         players.push({
+            id: players.length + 1,
             email: data.email,
             login: data.login,
             password: data.password,
+            logged: 'false',
+            playerTx: data.playerTx,
+            playerTy: data.playerTy,
         })
-        res.status(200).send('User successfully registered').end()
+        res.status(200)
+            .send('User successfully registered. Continue with logging in')
+            .end()
     }
 })
 
@@ -48,3 +58,6 @@ app.post('/login', function (req, res) {
 })
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`))
+/**
+ * u2 - Rene Bukovina
+ */

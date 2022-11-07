@@ -7,17 +7,17 @@ var gameHeight = 80 * size // tiles
 var roadSize = 6 * size //tiles
 let currentUser
 
-function addRegisterLogin() {
-    const register = document.createElement('BUTTON')
-    register.innerText = 'Register'
-    register.onclick = () => {
-        showRegistePopup()
-    }
-    document.body.appendChild(register)
-}
-addRegisterLogin()
+// function addRegisterLogin() {
+//     const register = document.createElement('BUTTON')
+//     register.innerText = 'Register'
+//     register.onclick = () => {
+//         showRegistePopup()
+//     }
+//     document.body.appendChild(register)
+// }
+// addRegisterLogin()
 
-function showRegistePopup() {
+function showRegistePopup(ws) {
     const form = document.createElement('div')
     form.id = 'form'
     form.style.padding = '20px'
@@ -79,14 +79,23 @@ function showRegistePopup() {
                 login: login.value,
                 password: password.value,
                 repeatPassword: repeatPassword.value,
+                playerTx,
+                playerTy,
             }),
         })
 
+        //if error
+        if (response.status != 200) {
+            alert(await response.text())
+            return
+        }
+
         alert(await response.text())
+        switchToLogin(ws)
     }
 
     const loginBtn = document.createElement('button')
-    loginBtn.innerText = 'loginBtn'
+    loginBtn.innerText = 'Login'
     loginBtn.style.marginTop = '20px'
     loginBtn.onclick = () => switchToLogin()
 
@@ -115,7 +124,7 @@ function showRegistePopup() {
     document.body.appendChild(form)
 }
 
-function switchToLogin() {
+function switchToLogin(ws) {
     const form = document.getElementById('form')
     form.innerHTML = ''
 
@@ -148,8 +157,14 @@ function switchToLogin() {
                 password: password.value,
             }),
         })
+        if (response.status != 200) {
+            alert(await response.text())
+            return
+        }
 
+        alert('Successfully logged in')
         const data = await response.json()
+        currentUser = data
     }
 
     const register = document.createElement('button')
@@ -157,7 +172,7 @@ function switchToLogin() {
     register.style.marginTop = '20px'
     register.onclick = () => {
         document.body.removeChild(form)
-        showRegistePopup()
+        showRegistePopup(ws)
     }
 
     const playAsGuest = document.createElement('button')
@@ -344,7 +359,6 @@ const socket = new WebSocket('ws://localhost:8082')
 // Connection opened
 socket.addEventListener('open', (e) => {
     console.log('Connected to WS Server')
-    socket.send('start the game ma man')
 })
 
 socket.addEventListener('message', (e) => {
@@ -354,10 +368,6 @@ socket.addEventListener('message', (e) => {
     drawLine(data.line)
     drawPlayer(data.playerTx, data.playerTy)
 })
-
-// function gameLoop() {
-//
-// }
 
 document.addEventListener('keydown', function (ev) {
     if (ev.keyCode === 38) movePlayer(-1)
