@@ -1,0 +1,11 @@
+FROM node:16
+WORKDIR app
+COPY static/ static/
+COPY server-side.js server-side.js
+COPY server.js server.js
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+RUN npm i
+EXPOSE 8080
+EXPOSE 8082
+CMD ["node", "server.js"]

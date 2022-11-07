@@ -7,17 +7,7 @@ var gameHeight = 80 * size // tiles
 var roadSize = 6 * size //tiles
 let currentUser
 
-// function addRegisterLogin() {
-//     const register = document.createElement('BUTTON')
-//     register.innerText = 'Register'
-//     register.onclick = () => {
-//         showRegistePopup()
-//     }
-//     document.body.appendChild(register)
-// }
-// addRegisterLogin()
-
-function showRegistePopup(ws) {
+function showRegistePopup() {
     const form = document.createElement('div')
     form.id = 'form'
     form.style.padding = '20px'
@@ -79,8 +69,6 @@ function showRegistePopup(ws) {
                 login: login.value,
                 password: password.value,
                 repeatPassword: repeatPassword.value,
-                playerTx,
-                playerTy,
             }),
         })
 
@@ -91,7 +79,7 @@ function showRegistePopup(ws) {
         }
 
         alert(await response.text())
-        switchToLogin(ws)
+        switchToLogin()
     }
 
     const loginBtn = document.createElement('button')
@@ -124,7 +112,7 @@ function showRegistePopup(ws) {
     document.body.appendChild(form)
 }
 
-function switchToLogin(ws) {
+function switchToLogin() {
     const form = document.getElementById('form')
     form.innerHTML = ''
 
@@ -165,6 +153,8 @@ function switchToLogin(ws) {
         alert('Successfully logged in')
         const data = await response.json()
         currentUser = data
+        socket.send(JSON.stringify({ type: 'init' }))
+        document.body.removeChild(form)
     }
 
     const register = document.createElement('button')
@@ -172,7 +162,7 @@ function switchToLogin(ws) {
     register.style.marginTop = '20px'
     register.onclick = () => {
         document.body.removeChild(form)
-        showRegistePopup(ws)
+        showRegistePopup()
     }
 
     const playAsGuest = document.createElement('button')
@@ -346,12 +336,6 @@ function drawLine(line) {
     drawEdgeLine(edge)
 }
 
-function movePlayer(points) {
-    playerTy = playerTy + points
-    if (playerTy < 0) playerTy = 0
-    if (playerTy > gameHeight - 3) playerTy = gameHeight - 3
-}
-
 grid()
 
 const socket = new WebSocket('ws://localhost:8082')
@@ -359,19 +343,36 @@ const socket = new WebSocket('ws://localhost:8082')
 // Connection opened
 socket.addEventListener('open', (e) => {
     console.log('Connected to WS Server')
+    showRegistePopup()
 })
+
+const title = document.querySelector('h1')
 
 socket.addEventListener('message', (e) => {
     const data = JSON.parse(e.data)
+    title.textContent = `Speed: ${data.speed} Score: ${data.score}`
     iter = data.iter
     undrawLine()
     drawLine(data.line)
     drawPlayer(data.playerTx, data.playerTy)
 })
 
-document.addEventListener('keydown', function (ev) {
-    if (ev.keyCode === 38) movePlayer(-1)
-    else if (ev.keyCode === 40) movePlayer(1)
+document.addEventListener('keydown', async function (ev) {
+    if (ev.keyCode === 38) {
+        socket.send(
+            JSON.stringify({
+                type: 'update',
+                direction: -1,
+            })
+        )
+    } else if (ev.keyCode === 40) {
+        socket.send(
+            JSON.stringify({
+                type: 'update',
+                direction: 1,
+            })
+        )
+    }
 })
 
 /**
